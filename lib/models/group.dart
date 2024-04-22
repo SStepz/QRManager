@@ -1,43 +1,70 @@
 import 'dart:io';
 
+import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
+
+part 'group.g.dart';
 
 const uuid = Uuid();
 
+@HiveType(typeId: 0)
 class Group {
   Group({
     required this.name,
-    this.members = const [],
+    List<Member>? members,
     String? id,
-  }) : id = id ?? uuid.v4();
+  })  : id = id ?? uuid.v4(),
+        members = members ?? [];
 
+  @HiveField(0)
   final String id;
+
+  @HiveField(1)
   final String name;
+
+  @HiveField(2)
   List<Member> members;
 }
 
+@HiveType(typeId: 1)
 class Member {
   Member({
     required this.name,
-    this.qrCodes = const [],
+    List<QRCode>? qrCodes,
     String? id,
-  }) : id = id ?? uuid.v4();
+  })  : id = id ?? uuid.v4(),
+        qrCodes = qrCodes ?? [];
 
+  @HiveField(0)
   final String id;
+
+  @HiveField(1)
   final String name;
+
+  @HiveField(2)
   List<QRCode> qrCodes;
 }
 
+@HiveType(typeId: 2)
 class QRCode {
   QRCode({
     required this.name,
     required this.accountName,
-    required this.image,
+    required this.imagePath,
     String? id,
   }) : id = id ?? uuid.v4();
 
+  @HiveField(0)
   final String id;
+
+  @HiveField(1)
   final String name;
+
+  @HiveField(2)
   final String accountName;
-  final File image;
+
+  @HiveField(3)
+  final String imagePath;
+  
+  File get image => File(imagePath);
 }

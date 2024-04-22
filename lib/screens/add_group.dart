@@ -50,7 +50,7 @@ class _AddGroupScreenState extends ConsumerState<AddGroupScreen> {
     );
   }
 
-  void _saveGroup() {
+  void _saveGroup() async {
     final enteredName = _nameController.text;
 
     if (enteredName.isEmpty) {
@@ -58,9 +58,11 @@ class _AddGroupScreenState extends ConsumerState<AddGroupScreen> {
       return;
     }
 
-    ref.read(dataListProvider.notifier).addGroup(enteredName);
+    await ref.read(dataListProvider.notifier).addGroup(enteredName);
 
-    Navigator.of(context).pop();
+    if (mounted) {
+      Navigator.of(context).pop();
+    }
   }
 
   @override

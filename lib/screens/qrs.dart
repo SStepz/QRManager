@@ -146,7 +146,7 @@ class _QRsScreenState extends ConsumerState<QRsScreen> {
                           },
                         );
                         if (confirm!) {
-                          ref
+                          await ref
                               .read(dataListProvider.notifier)
                               .removeQR(group.id, member.id, qrCode.id);
                         }

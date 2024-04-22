@@ -65,7 +65,7 @@ class _EditMemberScreenState extends ConsumerState<EditMemberScreen> {
     );
   }
 
-  void _saveMember() {
+  void _saveMember() async {
     final enteredName = _nameController.text;
 
     if (enteredName.isEmpty) {
@@ -73,9 +73,11 @@ class _EditMemberScreenState extends ConsumerState<EditMemberScreen> {
       return;
     }
 
-    ref.read(dataListProvider.notifier).editMemberName(widget.groupId, widget.memberId, enteredName);
+    await ref.read(dataListProvider.notifier).editMemberName(widget.groupId, widget.memberId, enteredName);
 
-    Navigator.of(context).pop();
+    if (mounted) {
+      Navigator.of(context).pop();
+    }
   }
 
   @override

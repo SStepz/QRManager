@@ -48,24 +48,6 @@ class _ImageInputState extends State<ImageInput> {
 
   @override
   Widget build(BuildContext context) {
-    // Widget content = TextButton.icon(
-    //   icon: const Icon(Icons.camera),
-    //   label: const Text('Take Picture'),
-    //   onPressed: () => _chooseImage(ImageSource.camera),
-    // );
-
-    // if (_selectedImage != null) {
-    //   content = GestureDetector(
-    //     onTap: () => _chooseImage(ImageSource.camera),
-    //     child: Image.file(
-    //       _selectedImage!,
-    //       fit: BoxFit.cover,
-    //       width: double.infinity,
-    //       height: double.infinity,
-    //     ),
-    //   );
-    // }
-
     Widget content = Stack(
       alignment: Alignment.bottomCenter,
       children: [

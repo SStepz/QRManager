@@ -54,7 +54,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
                     ),
               ),
               subtitle: Text(
-                '${group.members.length} members',
+                group.members.length > 1 ? '${group.members.length} Members' : '${group.members.length} Member',
                 style: Theme.of(context).textTheme.titleMedium!.copyWith(
                       color: Theme.of(context).colorScheme.onSecondaryContainer,
                       fontWeight: FontWeight.normal,
@@ -142,7 +142,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
                           },
                         );
                         if (confirm!) {
-                          ref
+                          await ref
                               .read(dataListProvider.notifier)
                               .removeGroup(group.id);
                         }

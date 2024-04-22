@@ -67,7 +67,7 @@ class _AddQRScreenState extends ConsumerState<AddQRScreen> {
     );
   }
 
-  void _saveMember() {
+  void _saveMember() async {
     final enteredName = _nameController.text;
     final enteredAccountName = _accountNameController.text;
 
@@ -78,15 +78,17 @@ class _AddQRScreenState extends ConsumerState<AddQRScreen> {
       return;
     }
 
-    ref.read(dataListProvider.notifier).addQR(
+    await ref.read(dataListProvider.notifier).addQR(
         widget.groupId,
         widget.memberId,
         QRCode(
             name: enteredName,
             accountName: enteredAccountName,
-            image: _selectedImage!));
+            imagePath: _selectedImage!.path));
 
-    Navigator.of(context).pop();
+    if (mounted) {
+      Navigator.of(context).pop();
+    }
   }
 
   @override

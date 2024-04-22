@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
+import 'package:qr_manager/models/group.dart';
 import 'package:qr_manager/screens/groups.dart';
 
 final colorScheme = ColorScheme.fromSeed(
@@ -27,7 +29,11 @@ final theme = ThemeData().copyWith(
   ),
 );
 
-void main() {
+void main() async {
+  await Hive.initFlutter();
+  Hive.registerAdapter(GroupAdapter());
+  Hive.registerAdapter(MemberAdapter());
+  Hive.registerAdapter(QRCodeAdapter());
   runApp(
     const ProviderScope(
       child: MyApp(),

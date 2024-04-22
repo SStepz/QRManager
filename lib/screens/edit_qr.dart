@@ -73,7 +73,7 @@ class _EditQRScreenState extends ConsumerState<EditQRScreen> {
     );
   }
 
-  void _saveQR() {
+  void _saveQR() async {
     final enteredName = _nameController.text;
     final enteredAccountName = _accountNameController.text;
 
@@ -82,7 +82,7 @@ class _EditQRScreenState extends ConsumerState<EditQRScreen> {
       return;
     }
 
-    ref.read(dataListProvider.notifier).editQR(
+    await ref.read(dataListProvider.notifier).editQR(
         widget.groupId,
         widget.memberId,
         widget.qrCode.id,
@@ -90,9 +90,11 @@ class _EditQRScreenState extends ConsumerState<EditQRScreen> {
             id: widget.qrCode.id,
             name: enteredName,
             accountName: enteredAccountName,
-            image: _selectedImage!));
+            imagePath: _selectedImage!.path));
 
-    Navigator.of(context).pop();
+    if (mounted) {
+      Navigator.of(context).pop();
+    }
   }
 
   @override

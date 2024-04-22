@@ -59,7 +59,7 @@ class _AddMemberScreenState extends ConsumerState<AddMemberScreen> {
     );
   }
 
-  void _saveMember() {
+  void _saveMember() async {
     final enteredName = _nameController.text;
 
     if (enteredName.isEmpty) {
@@ -67,9 +67,11 @@ class _AddMemberScreenState extends ConsumerState<AddMemberScreen> {
       return;
     }
 
-    ref.read(dataListProvider.notifier).addMember(widget.groupId, enteredName);
+    await ref.read(dataListProvider.notifier).addMember(widget.groupId, enteredName);
 
-    Navigator.of(context).pop();
+    if (mounted) {
+      Navigator.of(context).pop();
+    }
   }
 
   @override

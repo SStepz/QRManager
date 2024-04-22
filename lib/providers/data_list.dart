@@ -1,114 +1,144 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive/hive.dart';
 
 import 'package:qr_manager/models/group.dart';
 
 class DataListNotifier extends StateNotifier<List<Group>> {
-  DataListNotifier() : super(const []);
-
-  void addGroup(String name) {
-    state = [...state, Group(name: name)];
+  DataListNotifier() : super(const []) {
+    _loadGroups();
   }
 
-  void addMember(String groupId, String memberName) {
-    state = state.map((group) {
-      if (group.id == groupId) {
-        final newMember = Member(name: memberName);
-        return Group(
-          id: groupId,
-          name: group.name,
-          members: [...group.members, newMember],
-        );
+  Future<void> _loadGroups() async {
+    final box = await Hive.openBox<Group>('groups');
+    state = box.values.toList();
+  }
+
+  Future<void> addGroup(String name) async {
+    final box = await Hive.openBox<Group>('groups');
+    final newGroup = Group(name: name);
+    box.add(newGroup);
+    state = box.values.toList();
+  }
+
+  Future<void> addMember(String groupId, String memberName) async {
+    final box = await Hive.openBox<Group>('groups');
+    final groupIndex = box.values.toList().indexWhere((n) => n.id == groupId);
+    if (groupIndex != -1) {
+      final group = box.getAt(groupIndex);
+      final newMember = Member(name: memberName);
+      group!.members.add(newMember);
+      await box.putAt(groupIndex, group);
+      state = box.values.toList();
+    }
+  }
+
+  Future<void> addQR(String groupId, String memberId, QRCode qrCode) async {
+    final box = await Hive.openBox<Group>('groups');
+    final groupIndex = box.values.toList().indexWhere((n) => n.id == groupId);
+    if (groupIndex != -1) {
+      final group = box.getAt(groupIndex);
+      final memberIndex = group!.members.indexWhere((n) => n.id == memberId);
+      if (memberIndex != -1) {
+        final member = group.members[memberIndex];
+        member.qrCodes.add(qrCode);
+        await box.putAt(groupIndex, group);
+        state = box.values.toList();
       }
-      return group;
-    }).toList();
+    }
   }
 
-  void addQR(String groupId, String memberId, QRCode qrCode) {
-    state = state.map((group) {
-      if (group.id == groupId) {
-        group.members = group.members.map((member) {
-          if (member.id == memberId) {
-            return Member(
-              id: memberId,
-              name: member.name,
-              qrCodes: [...member.qrCodes, qrCode],
-            );
-          }
-          return member;
-        }).toList();
+  Future<void> removeGroup(String groupId) async {
+    final box = await Hive.openBox<Group>('groups');
+    final groupIndex = box.values.toList().indexWhere((n) => n.id == groupId);
+    if (groupIndex != -1) {
+      await box.deleteAt(groupIndex);
+      state = box.values.toList();
+    }
+  }
+
+  Future<void> removeMember(String groupId, String memberId) async {
+    final box = await Hive.openBox<Group>('groups');
+    final groupIndex = box.values.toList().indexWhere((n) => n.id == groupId);
+    if (groupIndex != -1) {
+      final group = box.getAt(groupIndex);
+      final memberIndex = group!.members.indexWhere((n) => n.id == memberId);
+      if (memberIndex != -1) {
+        group.members.removeAt(memberIndex);
+        await box.putAt(groupIndex, group);
+        state = box.values.toList();
       }
-      return group;
-    }).toList();
+    }
   }
 
-  void removeGroup(String id) {
-    state = state.where((n) => n.id != id).toList();
-  }
-
-  void removeMember(String groupId, String memberId) {
-    state = state.map((group) {
-      if (group.id == groupId) {
-        group.members = group.members.where((n) => n.id != memberId).toList();
+  Future<void> removeQR(String groupId, String memberId, String qrId) async {
+    final box = await Hive.openBox<Group>('groups');
+    final groupIndex = box.values.toList().indexWhere((n) => n.id == groupId);
+    if (groupIndex != -1) {
+      final group = box.getAt(groupIndex);
+      final memberIndex = group!.members.indexWhere((n) => n.id == memberId);
+      if (memberIndex != -1) {
+        final member = group.members[memberIndex];
+        final qrIndex = member.qrCodes.indexWhere((n) => n.id == qrId);
+        if (qrIndex != -1) {
+          member.qrCodes.removeAt(qrIndex);
+          await box.putAt(groupIndex, group);
+          state = box.values.toList();
+        }
       }
-      return group;
-    }).toList();
+    }
   }
 
-  void removeQR(String groupId, String memberId, String qrId) {
-    state = state.map((group) {
-      if (group.id == groupId) {
-        group.members = group.members.map((member) {
-          if (member.id == memberId) {
-            member.qrCodes = member.qrCodes.where((n) => n.id != qrId).toList();
-          }
-          return member;
-        }).toList();
-      }
-      return group;
-    }).toList();
+  Future<void> editGroupName(String groupId, String newName) async {
+    final box = await Hive.openBox<Group>('groups');
+    final groupIndex = box.values.toList().indexWhere((n) => n.id == groupId);
+    if (groupIndex != -1) {
+      final oldGroup = box.getAt(groupIndex);
+      final newGroup =
+          Group(id: groupId, name: newName, members: oldGroup!.members);
+      await box.putAt(groupIndex, newGroup);
+      state = box.values.toList();
+    }
   }
 
-  void editGroupName(String id, String newName) {
-    state = state.map((group) {
-      if (group.id == id) {
-        return Group(id: id, name: newName, members: group.members);
+  Future<void> editMemberName(
+      String groupId, String memberId, String newMemberName) async {
+    final box = await Hive.openBox<Group>('groups');
+    final groupIndex = box.values.toList().indexWhere((n) => n.id == groupId);
+    if (groupIndex != -1) {
+      final group = box.getAt(groupIndex);
+      final memberIndex = group!.members.indexWhere((n) => n.id == memberId);
+      if (memberIndex != -1) {
+        final oldMember = group.members[memberIndex];
+        final newMember = Member(
+            id: memberId, name: newMemberName, qrCodes: oldMember.qrCodes);
+        group.members[memberIndex] = newMember;
+        await box.putAt(groupIndex, group);
+        state = box.values.toList();
       }
-      return group;
-    }).toList();
+    }
   }
 
-  void editMemberName(String groupId, String memberId, String newMemberName) {
-    state = state.map((group) {
-      if (group.id == groupId) {
-        group.members = group.members.map((member) {
-          if (member.id == memberId) {
-            return Member(
-                id: memberId, name: newMemberName, qrCodes: member.qrCodes);
-          }
-          return member;
-        }).toList();
+  Future<void> editQR(
+    String groupId,
+    String memberId,
+    String qrId,
+    QRCode qrCode,
+  ) async {
+    final box = await Hive.openBox<Group>('groups');
+    final groupIndex = box.values.toList().indexWhere((n) => n.id == groupId);
+    if (groupIndex != -1) {
+      final group = box.getAt(groupIndex);
+      final memberIndex = group!.members.indexWhere((n) => n.id == memberId);
+      if (memberIndex != -1) {
+        final member = group.members[memberIndex];
+        final qrIndex = member.qrCodes.indexWhere((n) => n.id == qrId);
+        if (qrIndex != -1) {
+          member.qrCodes[qrIndex] = qrCode;
+          await box.putAt(groupIndex, group);
+          state = box.values.toList();
+        }
       }
-      return group;
-    }).toList();
-  }
-
-  void editQR(String groupId, String memberId, String qrId, QRCode qrCode) {
-    state = state.map((group) {
-      if (group.id == groupId) {
-        group.members = group.members.map((member) {
-          if (member.id == memberId) {
-            member.qrCodes = member.qrCodes.map((qr) {
-              if (qr.id == qrId) {
-                return qrCode;
-              }
-              return qr;
-            }).toList();
-          }
-          return member;
-        }).toList();
-      }
-      return group;
-    }).toList();
+    }
   }
 }
 

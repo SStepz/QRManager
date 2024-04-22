@@ -63,7 +63,7 @@ class _EditGroupScreenState extends ConsumerState<EditGroupScreen> {
     );
   }
 
-  void _saveGroup() {
+  void _saveGroup() async {
     final enteredName = _nameController.text;
 
     if (enteredName.isEmpty) {
@@ -71,9 +71,11 @@ class _EditGroupScreenState extends ConsumerState<EditGroupScreen> {
       return;
     }
 
-    ref.read(dataListProvider.notifier).editGroupName(widget.groupId, enteredName);
+    await ref.read(dataListProvider.notifier).editGroupName(widget.groupId, enteredName);
 
-    Navigator.of(context).pop();
+    if (mounted) {
+      Navigator.of(context).pop();
+    }
   }
 
   @override

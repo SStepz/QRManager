@@ -61,7 +61,7 @@ class _MembersScreenState extends ConsumerState<MembersScreen> {
                     ),
               ),
               subtitle: Text(
-                '${member.qrCodes.length} QR Codes',
+                member.qrCodes.length > 1 ? '${member.qrCodes.length} QR Codes' : '${member.qrCodes.length} QR Code',
                 style: Theme.of(context).textTheme.titleMedium!.copyWith(
                       color: Theme.of(context).colorScheme.onSecondaryContainer,
                       fontWeight: FontWeight.normal,
@@ -150,7 +150,7 @@ class _MembersScreenState extends ConsumerState<MembersScreen> {
                           },
                         );
                         if (confirm!) {
-                          ref
+                          await ref
                               .read(dataListProvider.notifier)
                               .removeMember(group.id, member.id);
                         }
