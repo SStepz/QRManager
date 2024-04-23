@@ -1,33 +1,44 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:qr_manager/models/group.dart';
 import 'package:qr_manager/providers/data_list.dart';
+import 'package:qr_manager/models/group.dart';
 import 'package:qr_manager/widgets/image_input.dart';
 
-class AddQRScreen extends ConsumerStatefulWidget {
-  const AddQRScreen({
+class ModifyQRScreen extends ConsumerStatefulWidget {
+  const ModifyQRScreen({
     super.key,
     required this.groupId,
     required this.memberId,
+    this.qrCode,
   });
 
   final String groupId;
   final String memberId;
+  final QRCode? qrCode;
 
   @override
-  ConsumerState<AddQRScreen> createState() {
-    return _AddQRScreenState();
+  ConsumerState<ModifyQRScreen> createState() {
+    return _ModifyQRScreenState();
   }
 }
 
-class _AddQRScreenState extends ConsumerState<AddQRScreen> {
+class _ModifyQRScreenState extends ConsumerState<ModifyQRScreen> {
   final _nameController = TextEditingController();
   final _accountNameController = TextEditingController();
   File? _selectedImage;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.qrCode != null) {
+      _nameController.text = widget.qrCode!.name;
+      _accountNameController.text = widget.qrCode!.accountName;
+      _selectedImage = widget.qrCode!.image;
+    }
+  }
 
   void _showDialog() {
     showDialog(
@@ -35,31 +46,27 @@ class _AddQRScreenState extends ConsumerState<AddQRScreen> {
       builder: (ctx) => AlertDialog(
         title: Text(
           'Invalid input',
-          textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.titleLarge!.copyWith(
                 color: Theme.of(context).colorScheme.primaryContainer,
               ),
         ),
         content: Text(
           'Please make sure every field is valid.',
-          textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                 color: Theme.of(context).colorScheme.primaryContainer,
               ),
         ),
         actions: [
-          Center(
-            child: TextButton(
-              onPressed: () {
-                Navigator.pop(ctx);
-              },
-              child: Text(
-                'Okay',
-                style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                      color: Theme.of(context).colorScheme.primaryContainer,
-                      fontWeight: FontWeight.bold,
-                    ),
-              ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+            },
+            child: Text(
+              'Okay',
+              style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                    color: Theme.of(context).colorScheme.primaryContainer,
+                    fontWeight: FontWeight.bold,
+                  ),
             ),
           ),
         ],
@@ -67,7 +74,7 @@ class _AddQRScreenState extends ConsumerState<AddQRScreen> {
     );
   }
 
-  void _saveMember() async {
+  void _saveQR() async {
     final enteredName = _nameController.text;
     final enteredAccountName = _accountNameController.text;
 
@@ -78,13 +85,25 @@ class _AddQRScreenState extends ConsumerState<AddQRScreen> {
       return;
     }
 
-    await ref.read(dataListProvider.notifier).addQR(
-        widget.groupId,
-        widget.memberId,
-        QRCode(
-            name: enteredName,
-            accountName: enteredAccountName,
-            imagePath: _selectedImage!.path));
+    if (widget.qrCode == null) {
+      await ref.read(dataListProvider.notifier).addQR(
+          widget.groupId,
+          widget.memberId,
+          QRCode(
+              name: enteredName,
+              accountName: enteredAccountName,
+              imagePath: _selectedImage!.path));
+    } else {
+      await ref.read(dataListProvider.notifier).editQR(
+          widget.groupId,
+          widget.memberId,
+          widget.qrCode!.id,
+          QRCode(
+              id: widget.qrCode!.id,
+              name: enteredName,
+              accountName: enteredAccountName,
+              imagePath: _selectedImage!.path));
+    }
 
     if (mounted) {
       Navigator.of(context).pop();
@@ -102,7 +121,9 @@ class _AddQRScreenState extends ConsumerState<AddQRScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add New QR Code'),
+        title: widget.qrCode == null
+            ? const Text('Add New QR Code')
+            : const Text('Edit QR Code'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(12),
@@ -129,17 +150,22 @@ class _AddQRScreenState extends ConsumerState<AddQRScreen> {
                 color: Theme.of(context).colorScheme.onBackground,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
             ImageInput(
+              initialImage: _selectedImage,
               onPickImage: (image) {
                 _selectedImage = image;
               },
             ),
             const SizedBox(height: 16),
             ElevatedButton.icon(
-              onPressed: _saveMember,
-              icon: const Icon(Icons.add),
-              label: const Text('Add QR Code'),
+              onPressed: _saveQR,
+              icon: widget.qrCode == null
+                  ? const Icon(Icons.add)
+                  : const Icon(Icons.save),
+              label: widget.qrCode == null
+                  ? const Text('Add QR Code')
+                  : const Text('Save'),
             ),
           ],
         ),

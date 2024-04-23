@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:qr_manager/providers/data_list.dart';
-import 'package:qr_manager/screens/add_qr.dart';
-import 'package:qr_manager/screens/edit_qr.dart';
+import 'package:qr_manager/screens/modify_qr.dart';
 import 'package:qr_manager/screens/qr_detail.dart';
 
 class QRsScreen extends ConsumerStatefulWidget {
@@ -72,10 +71,11 @@ class _QRsScreenState extends ConsumerState<QRsScreen> {
                       onPressed: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (ctx) => EditQRScreen(
-                                groupId: group.id,
-                                memberId: member.id,
-                                qrCode: qrCode),
+                            builder: (ctx) => ModifyQRScreen(
+                              groupId: group.id,
+                              memberId: member.id,
+                              qrCode: qrCode,
+                            ),
                           ),
                         );
                       },
@@ -182,7 +182,7 @@ class _QRsScreenState extends ConsumerState<QRsScreen> {
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (ctx) => AddQRScreen(
+                  builder: (ctx) => ModifyQRScreen(
                     groupId: group.id,
                     memberId: member.id,
                   ),

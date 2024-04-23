@@ -4,17 +4,32 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:qr_manager/providers/data_list.dart';
 
-class AddGroupScreen extends ConsumerStatefulWidget {
-  const AddGroupScreen({super.key});
+class ModifyGroupScreen extends ConsumerStatefulWidget {
+  const ModifyGroupScreen({
+    super.key,
+    this.groupId,
+    this.groupName,
+  });
+
+  final String? groupId;
+  final String? groupName;
 
   @override
-  ConsumerState<AddGroupScreen> createState() {
-    return _AddGroupScreenState();
+  ConsumerState<ModifyGroupScreen> createState() {
+    return _ModifyGroupScreenState();
   }
 }
 
-class _AddGroupScreenState extends ConsumerState<AddGroupScreen> {
+class _ModifyGroupScreenState extends ConsumerState<ModifyGroupScreen> {
   final _nameController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.groupName != null) {
+      _nameController.text = widget.groupName!;
+    }
+  }
 
   void _showDialog() {
     showDialog(
@@ -58,7 +73,13 @@ class _AddGroupScreenState extends ConsumerState<AddGroupScreen> {
       return;
     }
 
-    await ref.read(dataListProvider.notifier).addGroup(enteredName);
+    if (widget.groupName == null) {
+      await ref.read(dataListProvider.notifier).addGroup(enteredName);
+    } else {
+      await ref
+          .read(dataListProvider.notifier)
+          .editGroupName(widget.groupId!, enteredName);
+    }
 
     if (mounted) {
       Navigator.of(context).pop();
@@ -75,7 +96,9 @@ class _AddGroupScreenState extends ConsumerState<AddGroupScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add New Group'),
+        title: widget.groupName == null
+            ? const Text('Add New Group')
+            : const Text('Edit Group'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(12),
@@ -94,8 +117,12 @@ class _AddGroupScreenState extends ConsumerState<AddGroupScreen> {
             const SizedBox(height: 16),
             ElevatedButton.icon(
               onPressed: _saveGroup,
-              icon: const Icon(Icons.add),
-              label: const Text('Add Group'),
+              icon: widget.groupName == null
+                  ? const Icon(Icons.add)
+                  : const Icon(Icons.save),
+              label: widget.groupName == null
+                  ? const Text('Add Group')
+                  : const Text('Save'),
             ),
           ],
         ),

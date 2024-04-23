@@ -4,31 +4,33 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:qr_manager/providers/data_list.dart';
 
-class EditMemberScreen extends ConsumerStatefulWidget {
-  const EditMemberScreen({
+class ModifyMemberScreen extends ConsumerStatefulWidget {
+  const ModifyMemberScreen({
     super.key,
     required this.groupId,
-    required this.memberId,
-    required this.memberName,
+    this.memberId,
+    this.memberName,
   });
 
   final String groupId;
-  final String memberId;
-  final String memberName;
+  final String? memberId;
+  final String? memberName;
 
   @override
-  ConsumerState<EditMemberScreen> createState() {
-    return _EditMemberScreenState();
+  ConsumerState<ModifyMemberScreen> createState() {
+    return _ModifyMemberScreenState();
   }
 }
 
-class _EditMemberScreenState extends ConsumerState<EditMemberScreen> {
+class _ModifyMemberScreenState extends ConsumerState<ModifyMemberScreen> {
   final _nameController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _nameController.text = widget.memberName;
+    if (widget.memberName != null) {
+      _nameController.text = widget.memberName!;
+    }
   }
 
   void _showDialog() {
@@ -73,7 +75,15 @@ class _EditMemberScreenState extends ConsumerState<EditMemberScreen> {
       return;
     }
 
-    await ref.read(dataListProvider.notifier).editMemberName(widget.groupId, widget.memberId, enteredName);
+    if (widget.memberName == null) {
+      await ref
+          .read(dataListProvider.notifier)
+          .addMember(widget.groupId, enteredName);
+    } else {
+      await ref
+          .read(dataListProvider.notifier)
+          .editMemberName(widget.groupId, widget.memberId!, enteredName);
+    }
 
     if (mounted) {
       Navigator.of(context).pop();
@@ -90,7 +100,9 @@ class _EditMemberScreenState extends ConsumerState<EditMemberScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Edit Member'),
+        title: widget.memberName == null
+            ? const Text('Add New Member')
+            : const Text('Edit Member'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(12),
@@ -109,8 +121,12 @@ class _EditMemberScreenState extends ConsumerState<EditMemberScreen> {
             const SizedBox(height: 16),
             ElevatedButton.icon(
               onPressed: _saveMember,
-              icon: const Icon(Icons.save),
-              label: const Text('Save'),
+              icon: widget.memberName == null
+                  ? const Icon(Icons.add)
+                  : const Icon(Icons.save),
+              label: widget.memberName == null
+                  ? const Text('Add Member')
+                  : const Text('Save'),
             ),
           ],
         ),

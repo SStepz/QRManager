@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:qr_manager/providers/data_list.dart';
-import 'package:qr_manager/screens/add_group.dart';
-import 'package:qr_manager/screens/edit_group.dart';
+import 'package:qr_manager/screens/modify_group.dart';
 import 'package:qr_manager/screens/members.dart';
 
 class GroupsScreen extends ConsumerStatefulWidget {
@@ -68,7 +67,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
                       onPressed: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (ctx) => EditGroupScreen(
+                            builder: (ctx) => ModifyGroupScreen(
                               groupId: group.id,
                               groupName: group.name,
                             ),
@@ -174,7 +173,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (ctx) => const AddGroupScreen(),
+                  builder: (ctx) => const ModifyGroupScreen(),
                 ),
               );
             },

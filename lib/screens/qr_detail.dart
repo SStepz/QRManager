@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:qr_manager/providers/data_list.dart';
-import 'package:qr_manager/screens/edit_qr.dart';
+import 'package:qr_manager/screens/modify_qr.dart';
 
 class QRDetailScreen extends ConsumerStatefulWidget {
   const QRDetailScreen({
@@ -42,7 +42,7 @@ class _QRDetailScreenState extends ConsumerState<QRDetailScreen> {
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (ctx) => EditQRScreen(
+                  builder: (ctx) => ModifyQRScreen(
                     groupId: group.id,
                     memberId: member.id,
                     qrCode: qr,

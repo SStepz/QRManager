@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:qr_manager/providers/data_list.dart';
-import 'package:qr_manager/screens/add_member.dart';
-import 'package:qr_manager/screens/edit_member.dart';
+import 'package:qr_manager/screens/modify_member.dart';
 import 'package:qr_manager/screens/qrs.dart';
 
 class MembersScreen extends ConsumerStatefulWidget {
@@ -75,7 +74,7 @@ class _MembersScreenState extends ConsumerState<MembersScreen> {
                       onPressed: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (ctx) => EditMemberScreen(
+                            builder: (ctx) => ModifyMemberScreen(
                               groupId: group.id,
                               memberId: member.id,
                               memberName: member.name,
@@ -185,7 +184,7 @@ class _MembersScreenState extends ConsumerState<MembersScreen> {
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (ctx) => AddMemberScreen(groupId: group.id),
+                  builder: (ctx) => ModifyMemberScreen(groupId: group.id),
                 ),
               );
             },
