@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:collection/collection.dart';
 
 import 'package:qr_manager/providers/group_list.dart';
+import 'package:qr_manager/utils/dialog.dart';
 
 class ModifyGroupScreen extends ConsumerStatefulWidget {
   const ModifyGroupScreen({
@@ -31,45 +33,20 @@ class _ModifyGroupScreenState extends ConsumerState<ModifyGroupScreen> {
     }
   }
 
-  void _showDialog() {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(
-          'Invalid input',
-          style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                color: Theme.of(context).colorScheme.primaryContainer,
-              ),
-        ),
-        content: Text(
-          'Please make sure a valid name was entered.',
-          style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                color: Theme.of(context).colorScheme.primaryContainer,
-              ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-            },
-            child: Text(
-              'Okay',
-              style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                    color: Theme.of(context).colorScheme.primaryContainer,
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   void _saveGroup() async {
     final enteredName = _nameController.text;
 
+    final groupData = ref.watch(groupListProvider);
+    final existingGroup =
+        groupData.firstWhereOrNull((group) => group.name == enteredName && group.id != widget.groupId);
+
     if (enteredName.isEmpty) {
-      _showDialog();
+      showDialogWithMessage(context, 'Invalid Input', 'Please make sure a valid name was entered.');
+      return;
+    }
+
+    if (existingGroup != null) {
+      showDialogWithMessage(context, 'Invalid Input', 'A group with the same name already exists.');
       return;
     }
 

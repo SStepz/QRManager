@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_manager/models/group.dart';
 import 'package:qr_manager/providers/member_list.dart';
 import 'package:qr_manager/widgets/image_input.dart';
+import 'package:qr_manager/utils/dialog.dart';
 
 class ModifyQRScreen extends ConsumerStatefulWidget {
   const ModifyQRScreen({
@@ -38,40 +39,6 @@ class _ModifyQRScreenState extends ConsumerState<ModifyQRScreen> {
     }
   }
 
-  void _showDialog() {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(
-          'Invalid input',
-          style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                color: Theme.of(context).colorScheme.primaryContainer,
-              ),
-        ),
-        content: Text(
-          'Please make sure every field is valid.',
-          style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                color: Theme.of(context).colorScheme.primaryContainer,
-              ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-            },
-            child: Text(
-              'Okay',
-              style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                    color: Theme.of(context).colorScheme.primaryContainer,
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   void _saveQR() async {
     final enteredName = _nameController.text;
     final enteredAccountName = _accountNameController.text;
@@ -79,7 +46,7 @@ class _ModifyQRScreenState extends ConsumerState<ModifyQRScreen> {
     if (enteredName.isEmpty ||
         enteredAccountName.isEmpty ||
         _selectedImage == null) {
-      _showDialog();
+      showDialogWithMessage(context, 'Invalid Input', 'Please make sure every field is valid.');
       return;
     }
 

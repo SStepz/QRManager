@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:qr_manager/providers/group_list.dart';
+import 'package:collection/collection.dart';
 
+import 'package:qr_manager/providers/group_list.dart';
 import 'package:qr_manager/providers/member_list.dart';
+import 'package:qr_manager/utils/dialog.dart';
 
 class ModifyMemberScreen extends ConsumerStatefulWidget {
   const ModifyMemberScreen({
@@ -35,45 +37,20 @@ class _ModifyMemberScreenState extends ConsumerState<ModifyMemberScreen> {
     }
   }
 
-  void _showDialog() {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(
-          'Invalid input',
-          style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                color: Theme.of(context).colorScheme.primaryContainer,
-              ),
-        ),
-        content: Text(
-          'Please make sure a valid name was entered.',
-          style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                color: Theme.of(context).colorScheme.primaryContainer,
-              ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-            },
-            child: Text(
-              'Okay',
-              style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                    color: Theme.of(context).colorScheme.primaryContainer,
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   void _saveMember() async {
     final enteredName = _nameController.text;
 
+    final memberData = ref.watch(memberListProvider);
+    final existingMember =
+        memberData.firstWhereOrNull((member) => member.name == enteredName && member.id != widget.memberId);
+
     if (enteredName.isEmpty) {
-      _showDialog();
+      showDialogWithMessage(context, 'Invalid Input', 'Please make sure a valid name was entered.');
+      return;
+    }
+
+    if (existingMember != null) {
+      showDialogWithMessage(context, 'Invalid Input', 'A member with the same name already exists.');
       return;
     }
 
