@@ -2,17 +2,15 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:qr_manager/providers/data_list.dart';
+import 'package:qr_manager/providers/group_list.dart';
 
 class ModifyGroupScreen extends ConsumerStatefulWidget {
   const ModifyGroupScreen({
     super.key,
     this.groupId,
-    this.groupName,
   });
 
   final String? groupId;
-  final String? groupName;
 
   @override
   ConsumerState<ModifyGroupScreen> createState() {
@@ -24,10 +22,12 @@ class _ModifyGroupScreenState extends ConsumerState<ModifyGroupScreen> {
   final _nameController = TextEditingController();
 
   @override
-  void initState() {
-    super.initState();
-    if (widget.groupName != null) {
-      _nameController.text = widget.groupName!;
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (widget.groupId != null) {
+      final groupData = ref.watch(groupListProvider);
+      final group = groupData.firstWhere((group) => group.id == widget.groupId);
+      _nameController.text = group.name;
     }
   }
 
@@ -73,11 +73,11 @@ class _ModifyGroupScreenState extends ConsumerState<ModifyGroupScreen> {
       return;
     }
 
-    if (widget.groupName == null) {
-      await ref.read(dataListProvider.notifier).addGroup(enteredName);
+    if (widget.groupId == null) {
+      await ref.read(groupListProvider.notifier).addGroup(enteredName);
     } else {
       await ref
-          .read(dataListProvider.notifier)
+          .read(groupListProvider.notifier)
           .editGroupName(widget.groupId!, enteredName);
     }
 
@@ -96,7 +96,7 @@ class _ModifyGroupScreenState extends ConsumerState<ModifyGroupScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: widget.groupName == null
+        title: widget.groupId == null
             ? const Text('Add New Group')
             : const Text('Edit Group'),
       ),
@@ -117,10 +117,10 @@ class _ModifyGroupScreenState extends ConsumerState<ModifyGroupScreen> {
             const SizedBox(height: 16),
             ElevatedButton.icon(
               onPressed: _saveGroup,
-              icon: widget.groupName == null
+              icon: widget.groupId == null
                   ? const Icon(Icons.add)
                   : const Icon(Icons.save),
-              label: widget.groupName == null
+              label: widget.groupId == null
                   ? const Text('Add Group')
                   : const Text('Save'),
             ),

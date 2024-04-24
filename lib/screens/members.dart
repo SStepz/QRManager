@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:qr_manager/providers/data_list.dart';
+import 'package:qr_manager/providers/group_list.dart';
+import 'package:qr_manager/providers/member_list.dart';
 import 'package:qr_manager/screens/modify_member.dart';
 import 'package:qr_manager/screens/qrs.dart';
 
@@ -23,9 +24,12 @@ class MembersScreen extends ConsumerStatefulWidget {
 class _MembersScreenState extends ConsumerState<MembersScreen> {
   @override
   Widget build(BuildContext context) {
-    final data = ref.watch(dataListProvider);
-    final group = data.firstWhere((group) => group.id == widget.groupId);
-    final members = group.members;
+    final groupData = ref.watch(groupListProvider);
+    final memberData = ref.watch(memberListProvider);
+    final group = groupData.firstWhere((group) => group.id == widget.groupId);
+    final members = memberData
+        .where((member) => group.memberIds.contains(member.id))
+        .toList();
 
     Widget content = Center(
       child: Text(
@@ -60,7 +64,9 @@ class _MembersScreenState extends ConsumerState<MembersScreen> {
                     ),
               ),
               subtitle: Text(
-                member.qrCodes.length > 1 ? '${member.qrCodes.length} QR Codes' : '${member.qrCodes.length} QR Code',
+                member.qrCodes.length > 1
+                    ? '${member.qrCodes.length} QR Codes'
+                    : '${member.qrCodes.length} QR Code',
                 style: Theme.of(context).textTheme.titleMedium!.copyWith(
                       color: Theme.of(context).colorScheme.onSecondaryContainer,
                       fontWeight: FontWeight.normal,
@@ -77,7 +83,6 @@ class _MembersScreenState extends ConsumerState<MembersScreen> {
                             builder: (ctx) => ModifyMemberScreen(
                               groupId: group.id,
                               memberId: member.id,
-                              memberName: member.name,
                             ),
                           ),
                         );
@@ -150,8 +155,11 @@ class _MembersScreenState extends ConsumerState<MembersScreen> {
                         );
                         if (confirm!) {
                           await ref
-                              .read(dataListProvider.notifier)
+                              .read(groupListProvider.notifier)
                               .removeMember(group.id, member.id);
+                          await ref
+                              .read(memberListProvider.notifier)
+                              .removeMember(member.id);
                         }
                       },
                       icon: const Icon(Icons.delete),

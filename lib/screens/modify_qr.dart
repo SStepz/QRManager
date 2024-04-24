@@ -3,19 +3,17 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:qr_manager/providers/data_list.dart';
 import 'package:qr_manager/models/group.dart';
+import 'package:qr_manager/providers/member_list.dart';
 import 'package:qr_manager/widgets/image_input.dart';
 
 class ModifyQRScreen extends ConsumerStatefulWidget {
   const ModifyQRScreen({
     super.key,
-    required this.groupId,
     required this.memberId,
     this.qrCode,
   });
 
-  final String groupId;
   final String memberId;
   final QRCode? qrCode;
 
@@ -86,16 +84,14 @@ class _ModifyQRScreenState extends ConsumerState<ModifyQRScreen> {
     }
 
     if (widget.qrCode == null) {
-      await ref.read(dataListProvider.notifier).addQR(
-          widget.groupId,
+      await ref.read(memberListProvider.notifier).addQR(
           widget.memberId,
           QRCode(
               name: enteredName,
               accountName: enteredAccountName,
               imagePath: _selectedImage!.path));
     } else {
-      await ref.read(dataListProvider.notifier).editQR(
-          widget.groupId,
+      await ref.read(memberListProvider.notifier).editQR(
           widget.memberId,
           widget.qrCode!.id,
           QRCode(

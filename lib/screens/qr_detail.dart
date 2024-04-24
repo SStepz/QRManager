@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:qr_manager/providers/data_list.dart';
+import 'package:qr_manager/providers/member_list.dart';
 import 'package:qr_manager/screens/modify_qr.dart';
 
 class QRDetailScreen extends ConsumerStatefulWidget {
@@ -26,10 +26,9 @@ class QRDetailScreen extends ConsumerStatefulWidget {
 class _QRDetailScreenState extends ConsumerState<QRDetailScreen> {
   @override
   Widget build(BuildContext context) {
-    final data = ref.watch(dataListProvider);
-    final group = data.firstWhere((group) => group.id == widget.groupId);
+    final memberData = ref.watch(memberListProvider);
     final member =
-        group.members.firstWhere((member) => member.id == widget.memberId);
+        memberData.firstWhere((member) => member.id == widget.memberId);
     final qrCodes = member.qrCodes;
     final qr = qrCodes.firstWhere((qr) => qr.id == widget.qrId);
 
@@ -43,7 +42,6 @@ class _QRDetailScreenState extends ConsumerState<QRDetailScreen> {
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (ctx) => ModifyQRScreen(
-                    groupId: group.id,
                     memberId: member.id,
                     qrCode: qr,
                   ),

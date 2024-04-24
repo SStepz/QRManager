@@ -11,10 +11,10 @@ const uuid = Uuid();
 class Group {
   Group({
     required this.name,
-    List<Member>? members,
+    List<String>? memberIds,
     String? id,
   })  : id = id ?? uuid.v4(),
-        members = members ?? [];
+        memberIds = memberIds ?? [];
 
   @HiveField(0)
   final String id;
@@ -23,7 +23,7 @@ class Group {
   final String name;
 
   @HiveField(2)
-  List<Member> members;
+  List<String> memberIds;
 }
 
 @HiveType(typeId: 1)

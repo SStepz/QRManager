@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:qr_manager/providers/data_list.dart';
+import 'package:qr_manager/providers/group_list.dart';
 import 'package:qr_manager/screens/modify_group.dart';
 import 'package:qr_manager/screens/members.dart';
 
@@ -18,7 +18,7 @@ class GroupsScreen extends ConsumerStatefulWidget {
 class _GroupsScreenState extends ConsumerState<GroupsScreen> {
   @override
   Widget build(BuildContext context) {
-    final data = ref.watch(dataListProvider);
+    final groupData = ref.watch(groupListProvider);
 
     Widget content = Center(
       child: Text(
@@ -29,12 +29,12 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
       ),
     );
 
-    if (data.isNotEmpty) {
+    if (groupData.isNotEmpty) {
       content = ListView.builder(
         padding: const EdgeInsets.all(8),
-        itemCount: data.length,
+        itemCount: groupData.length,
         itemBuilder: (context, index) {
-          final group = data[index];
+          final group = groupData[index];
           return Container(
             margin: const EdgeInsets.symmetric(vertical: 4),
             child: ListTile(
@@ -53,7 +53,9 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
                     ),
               ),
               subtitle: Text(
-                group.members.length > 1 ? '${group.members.length} Members' : '${group.members.length} Member',
+                group.memberIds.length > 1
+                    ? '${group.memberIds.length} Members'
+                    : '${group.memberIds.length} Member',
                 style: Theme.of(context).textTheme.titleMedium!.copyWith(
                       color: Theme.of(context).colorScheme.onSecondaryContainer,
                       fontWeight: FontWeight.normal,
@@ -67,10 +69,8 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
                       onPressed: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (ctx) => ModifyGroupScreen(
-                              groupId: group.id,
-                              groupName: group.name,
-                            ),
+                            builder: (ctx) =>
+                                ModifyGroupScreen(groupId: group.id),
                           ),
                         );
                       },
@@ -142,7 +142,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
                         );
                         if (confirm!) {
                           await ref
-                              .read(dataListProvider.notifier)
+                              .read(groupListProvider.notifier)
                               .removeGroup(group.id);
                         }
                       },

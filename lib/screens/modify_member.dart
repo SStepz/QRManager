@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:qr_manager/providers/group_list.dart';
 
-import 'package:qr_manager/providers/data_list.dart';
+import 'package:qr_manager/providers/member_list.dart';
 
 class ModifyMemberScreen extends ConsumerStatefulWidget {
   const ModifyMemberScreen({
     super.key,
     required this.groupId,
     this.memberId,
-    this.memberName,
   });
 
   final String groupId;
   final String? memberId;
-  final String? memberName;
 
   @override
   ConsumerState<ModifyMemberScreen> createState() {
@@ -26,10 +25,13 @@ class _ModifyMemberScreenState extends ConsumerState<ModifyMemberScreen> {
   final _nameController = TextEditingController();
 
   @override
-  void initState() {
-    super.initState();
-    if (widget.memberName != null) {
-      _nameController.text = widget.memberName!;
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (widget.memberId != null) {
+      final memberData = ref.watch(memberListProvider);
+      final member =
+          memberData.firstWhere((member) => member.id == widget.memberId);
+      _nameController.text = member.name;
     }
   }
 
@@ -75,14 +77,15 @@ class _ModifyMemberScreenState extends ConsumerState<ModifyMemberScreen> {
       return;
     }
 
-    if (widget.memberName == null) {
+    if (widget.memberId == null) {
+      final memberId = await ref.read(memberListProvider.notifier).addMember(enteredName);
       await ref
-          .read(dataListProvider.notifier)
-          .addMember(widget.groupId, enteredName);
+          .read(groupListProvider.notifier)
+          .addMember(widget.groupId, memberId);
     } else {
       await ref
-          .read(dataListProvider.notifier)
-          .editMemberName(widget.groupId, widget.memberId!, enteredName);
+          .read(memberListProvider.notifier)
+          .editMemberName(widget.memberId!, enteredName);
     }
 
     if (mounted) {
@@ -100,7 +103,7 @@ class _ModifyMemberScreenState extends ConsumerState<ModifyMemberScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: widget.memberName == null
+        title: widget.memberId == null
             ? const Text('Add New Member')
             : const Text('Edit Member'),
       ),
@@ -121,10 +124,10 @@ class _ModifyMemberScreenState extends ConsumerState<ModifyMemberScreen> {
             const SizedBox(height: 16),
             ElevatedButton.icon(
               onPressed: _saveMember,
-              icon: widget.memberName == null
+              icon: widget.memberId == null
                   ? const Icon(Icons.add)
                   : const Icon(Icons.save),
-              label: widget.memberName == null
+              label: widget.memberId == null
                   ? const Text('Add Member')
                   : const Text('Save'),
             ),

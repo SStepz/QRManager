@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:qr_manager/providers/data_list.dart';
+import 'package:qr_manager/providers/group_list.dart';
+import 'package:qr_manager/providers/member_list.dart';
 import 'package:qr_manager/screens/modify_qr.dart';
 import 'package:qr_manager/screens/qr_detail.dart';
 
@@ -25,10 +26,11 @@ class QRsScreen extends ConsumerStatefulWidget {
 class _QRsScreenState extends ConsumerState<QRsScreen> {
   @override
   Widget build(BuildContext context) {
-    final data = ref.watch(dataListProvider);
-    final group = data.firstWhere((group) => group.id == widget.groupId);
+    final groupData = ref.watch(groupListProvider);
+    final memberData = ref.watch(memberListProvider);
+    final group = groupData.firstWhere((group) => group.id == widget.groupId);
     final member =
-        group.members.firstWhere((member) => member.id == widget.memberId);
+        memberData.firstWhere((member) => member.id == widget.memberId);
     final qrCodes = member.qrCodes;
 
     Widget content = Center(
@@ -72,7 +74,6 @@ class _QRsScreenState extends ConsumerState<QRsScreen> {
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (ctx) => ModifyQRScreen(
-                              groupId: group.id,
                               memberId: member.id,
                               qrCode: qrCode,
                             ),
@@ -147,8 +148,8 @@ class _QRsScreenState extends ConsumerState<QRsScreen> {
                         );
                         if (confirm!) {
                           await ref
-                              .read(dataListProvider.notifier)
-                              .removeQR(group.id, member.id, qrCode.id);
+                              .read(memberListProvider.notifier)
+                              .removeQR(member.id, qrCode.id);
                         }
                       },
                       icon: const Icon(Icons.delete),
@@ -182,10 +183,7 @@ class _QRsScreenState extends ConsumerState<QRsScreen> {
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (ctx) => ModifyQRScreen(
-                    groupId: group.id,
-                    memberId: member.id,
-                  ),
+                  builder: (ctx) => ModifyQRScreen(memberId: member.id),
                 ),
               );
             },

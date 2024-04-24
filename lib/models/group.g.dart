@@ -18,7 +18,7 @@ class GroupAdapter extends TypeAdapter<Group> {
     };
     return Group(
       name: fields[1] as String,
-      members: (fields[2] as List?)?.cast<Member>(),
+      memberIds: (fields[2] as List?)?.cast<String>(),
       id: fields[0] as String?,
     );
   }
@@ -32,7 +32,7 @@ class GroupAdapter extends TypeAdapter<Group> {
       ..writeByte(1)
       ..write(obj.name)
       ..writeByte(2)
-      ..write(obj.members);
+      ..write(obj.memberIds);
   }
 
   @override
