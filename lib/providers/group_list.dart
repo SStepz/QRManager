@@ -31,13 +31,17 @@ class GroupListNotifier extends StateNotifier<List<Group>> {
     }
   }
 
-  Future<void> removeGroup(String groupId) async {
+  Future<List<String>> removeGroup(String groupId) async {
     final box = await Hive.openBox<Group>('groups');
     final groupIndex = box.values.toList().indexWhere((n) => n.id == groupId);
+    List<String> memberIds = [];
     if (groupIndex != -1) {
+      final group = box.getAt(groupIndex);
+      memberIds = List<String>.from(group!.memberIds);
       await box.deleteAt(groupIndex);
       state = box.values.toList();
     }
+    return memberIds;
   }
 
   Future<void> removeMember(String groupId, String memberId) async {
@@ -56,7 +60,8 @@ class GroupListNotifier extends StateNotifier<List<Group>> {
     final groupIndex = box.values.toList().indexWhere((n) => n.id == groupId);
     if (groupIndex != -1) {
       final oldGroup = box.getAt(groupIndex);
-      final newGroup = Group(id: groupId, name: newName, memberIds: oldGroup!.memberIds);
+      final newGroup =
+          Group(id: groupId, name: newName, memberIds: oldGroup!.memberIds);
       await box.putAt(groupIndex, newGroup);
       state = box.values.toList();
     }

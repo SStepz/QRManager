@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:qr_manager/providers/group_list.dart';
+import 'package:qr_manager/providers/member_list.dart';
 import 'package:qr_manager/screens/modify_group.dart';
 import 'package:qr_manager/screens/members.dart';
 
@@ -141,9 +142,14 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
                           },
                         );
                         if (confirm!) {
-                          await ref
+                          List<String> memberIds = await ref
                               .read(groupListProvider.notifier)
                               .removeGroup(group.id);
+                          for (var memberId in memberIds) {
+                            await ref
+                                .read(memberListProvider.notifier)
+                                .removeMember(memberId);
+                          }
                         }
                       },
                       icon: const Icon(Icons.delete),

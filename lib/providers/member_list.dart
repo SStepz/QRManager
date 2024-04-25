@@ -18,7 +18,7 @@ class MemberListNotifier extends StateNotifier<List<Member>> {
     final box = await Hive.openBox<Member>('members');
     final memberId = const Uuid().v4();
     final newMember = Member(id: memberId, name: name);
-    await box.add(newMember);
+    await box.put(memberId, newMember);
     state = box.values.toList();
     return memberId;
   }
@@ -38,6 +38,9 @@ class MemberListNotifier extends StateNotifier<List<Member>> {
     final box = await Hive.openBox<Member>('members');
     final memberIndex = box.values.toList().indexWhere((n) => n.id == memberId);
     if (memberIndex != -1) {
+      final member = box.getAt(memberIndex);
+      member!.qrCodes.clear();
+      await box.putAt(memberIndex, member);
       await box.deleteAt(memberIndex);
       state = box.values.toList();
     }
