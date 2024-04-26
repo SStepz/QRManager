@@ -1,34 +1,31 @@
 import 'package:flutter/material.dart';
 
+import 'package:qr_manager/src/common/components/custom_text.dart';
+
 class DisplayDialog {
   static void showDialogWithMessage(
       BuildContext context, String title, String message) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(
-          title,
-          style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                color: Theme.of(context).colorScheme.primaryContainer,
-              ),
+        title: CustomText.titleLarge(
+          context: context,
+          text: title,
+          weight: FontWeight.bold,
         ),
-        content: Text(
-          message,
-          style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                color: Theme.of(context).colorScheme.primaryContainer,
-              ),
+        content: CustomText.bodyLarge(
+          context: context,
+          text: message,
         ),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
             },
-            child: Text(
-              'Okay',
-              style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                    color: Theme.of(context).colorScheme.primaryContainer,
-                    fontWeight: FontWeight.bold,
-                  ),
+            child: CustomText.bodyLarge(
+              context: context,
+              text: 'Okay',
+              weight: FontWeight.bold,
             ),
           ),
         ],

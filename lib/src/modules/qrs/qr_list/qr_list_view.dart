@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_manager/src/data/models/group/group.dart';
 import 'package:qr_manager/src/data/models/member/member.dart';
 import 'package:qr_manager/src/modules/qrs/qr_list/qr_list_view_model.dart';
+import 'package:qr_manager/src/common/components/custom_text.dart';
+import 'package:qr_manager/src/common/components/custom_icon.dart';
 
 class QRListView extends ConsumerStatefulWidget {
   const QRListView({
@@ -33,11 +35,10 @@ class _QRListViewState extends ConsumerState<QRListView> {
     final qrCodes = member.qrCodes;
 
     Widget content = Center(
-      child: Text(
-        'No QR codes created yet.',
-        style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-              color: Theme.of(context).colorScheme.onBackground,
-            ),
+      child: CustomText.bodyLarge(
+        context: context,
+        text: 'No QR codes created yet.',
+        color: Theme.of(context).colorScheme.onBackground,
       ),
     );
 
@@ -54,15 +55,14 @@ class _QRListViewState extends ConsumerState<QRListView> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              leading: Icon(
-                Icons.qr_code_rounded,
-                color: Theme.of(context).colorScheme.onBackground,
+              leading: CustomIcon.colorIcon(
+                context: context,
+                icon: Icons.qr_code_rounded,
               ),
-              title: Text(
-                qrCode.name,
-                style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                      fontWeight: FontWeight.normal,
-                    ),
+              title: CustomText.titleLarge(
+                context: context,
+                text: qrCode.name,
+                color: Colors.white,
               ),
               trailing: SizedBox(
                 width: 100,
@@ -83,56 +83,30 @@ class _QRListViewState extends ConsumerState<QRListView> {
                           context: context,
                           builder: (ctx) {
                             return AlertDialog(
-                              title: Text(
-                                'Remove QR Code',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleLarge!
-                                    .copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .primaryContainer,
-                                    ),
+                              title: CustomText.titleLarge(
+                                context: context,
+                                text: 'Remove QR Code',
+                                weight: FontWeight.bold,
                               ),
-                              content: Text(
-                                'Are you sure you want to remove ${qrCode.name} from ${member.name}?',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyLarge!
-                                    .copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .primaryContainer,
-                                    ),
+                              content: CustomText.bodyLarge(
+                                context: context,
+                                text:
+                                    'Are you sure you want to remove ${qrCode.name} from ${member.name}?',
                               ),
                               actions: [
                                 TextButton(
-                                  child: Text(
-                                    'Cancel',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyLarge!
-                                        .copyWith(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primaryContainer,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                  child: CustomText.bodyLarge(
+                                    context: context,
+                                    text: 'Cancel',
+                                    weight: FontWeight.bold,
                                   ),
                                   onPressed: () => Navigator.of(ctx).pop(false),
                                 ),
                                 TextButton(
-                                  child: Text(
-                                    'Remove',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyLarge!
-                                        .copyWith(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primaryContainer,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                  child: CustomText.bodyLarge(
+                                    context: context,
+                                    text: 'Remove',
+                                    weight: FontWeight.bold,
                                   ),
                                   onPressed: () => Navigator.of(ctx).pop(true),
                                 ),

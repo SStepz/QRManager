@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:qr_manager/src/data/models/group/group.dart';
 import 'package:qr_manager/src/modules/groups/group_list/group_list_view_model.dart';
+import 'package:qr_manager/src/common/components/custom_text.dart';
+import 'package:qr_manager/src/common/components/custom_icon.dart';
 
 class GroupListView extends ConsumerStatefulWidget {
   const GroupListView({super.key});
@@ -20,11 +22,10 @@ class _GroupListViewState extends ConsumerState<GroupListView> {
     final groupData = ref.watch(Group.groupListProvider);
 
     Widget content = Center(
-      child: Text(
-        'No groups created yet.',
-        style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-              color: Theme.of(context).colorScheme.onBackground,
-            ),
+      child: CustomText.bodyLarge(
+        context: context,
+        text: 'No groups created yet.',
+        color: Theme.of(context).colorScheme.onBackground,
       ),
     );
 
@@ -41,24 +42,20 @@ class _GroupListViewState extends ConsumerState<GroupListView> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              leading: Icon(
-                Icons.groups,
-                color: Theme.of(context).colorScheme.onBackground,
+              leading: CustomIcon.colorIcon(
+                context: context,
+                icon: Icons.groups,
               ),
-              title: Text(
-                group.name,
-                style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                      fontWeight: FontWeight.normal,
-                    ),
+              title: CustomText.titleLarge(
+                context: context,
+                text: group.name,
+                color: Colors.white,
               ),
-              subtitle: Text(
-                group.memberIds.length > 1
+              subtitle: CustomText.titleMedium(
+                context: context,
+                text: group.memberIds.length > 1
                     ? '${group.memberIds.length} Members'
                     : '${group.memberIds.length} Member',
-                style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                      color: Theme.of(context).colorScheme.onSecondaryContainer,
-                      fontWeight: FontWeight.normal,
-                    ),
               ),
               trailing: SizedBox(
                 width: 100,
@@ -78,56 +75,30 @@ class _GroupListViewState extends ConsumerState<GroupListView> {
                           context: context,
                           builder: (ctx) {
                             return AlertDialog(
-                              title: Text(
-                                'Remove Group',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleLarge!
-                                    .copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .primaryContainer,
-                                    ),
+                              title: CustomText.titleLarge(
+                                context: context,
+                                text: 'Remove Group',
+                                weight: FontWeight.bold,
                               ),
-                              content: Text(
-                                'Are you sure you want to remove ${group.name} group?',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyLarge!
-                                    .copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .primaryContainer,
-                                    ),
+                              content: CustomText.bodyLarge(
+                                context: context,
+                                text:
+                                    'Are you sure you want to remove ${group.name} group?',
                               ),
                               actions: [
                                 TextButton(
-                                  child: Text(
-                                    'Cancel',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyLarge!
-                                        .copyWith(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primaryContainer,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                  child: CustomText.bodyLarge(
+                                    context: context,
+                                    text: 'Cancel',
+                                    weight: FontWeight.bold,
                                   ),
                                   onPressed: () => Navigator.of(ctx).pop(false),
                                 ),
                                 TextButton(
-                                  child: Text(
-                                    'Remove',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyLarge!
-                                        .copyWith(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primaryContainer,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                  child: CustomText.bodyLarge(
+                                    context: context,
+                                    text: 'Remove',
+                                    weight: FontWeight.bold,
                                   ),
                                   onPressed: () => Navigator.of(ctx).pop(true),
                                 ),

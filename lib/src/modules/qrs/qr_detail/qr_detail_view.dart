@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:qr_manager/src/data/models/member/member.dart';
 import 'package:qr_manager/src/modules/qrs/qr_detail/qr_detail_view_model.dart';
+import 'package:qr_manager/src/common/components/custom_text.dart';
 
 class QRDetailView extends ConsumerStatefulWidget {
   const QRDetailView({
@@ -65,11 +66,10 @@ class _QRDetailViewState extends ConsumerState<QRDetailView> {
                 borderRadius: BorderRadius.circular(8),
                 color: Theme.of(context).colorScheme.primaryContainer,
               ),
-              child: Text(
-                qr.accountName,
-                style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                      fontWeight: FontWeight.normal,
-                    ),
+              child: CustomText.titleLarge(
+                context: context,
+                text: qr.accountName,
+                color: Colors.white,
               ),
             ),
           ],
