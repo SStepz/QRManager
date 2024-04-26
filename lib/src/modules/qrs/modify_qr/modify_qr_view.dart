@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:qr_manager/src/data/models/member/member.dart';
-import 'package:qr_manager/src/common/components/image_input.dart';
+import 'package:qr_manager/src/modules/image_input/image_input_view.dart';
 import 'package:qr_manager/src/modules/qrs/modify_qr/modify_qr_view_model.dart';
 
 class ModifyQRView extends ConsumerStatefulWidget {
@@ -79,7 +79,7 @@ class _ModifyQRViewState extends ConsumerState<ModifyQRView> {
               ),
             ),
             const SizedBox(height: 10),
-            ImageInput(
+            ImageInputView(
               initialImage: _selectedImage,
               onPickImage: (image) {
                 _selectedImage = image;

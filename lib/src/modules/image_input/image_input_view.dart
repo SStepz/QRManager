@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 
 import 'package:image_picker/image_picker.dart';
 
-class ImageInput extends StatefulWidget {
-  const ImageInput({
+import 'package:qr_manager/src/modules/image_input/image_input_view_model.dart';
+
+class ImageInputView extends StatefulWidget {
+  const ImageInputView({
     super.key,
     this.initialImage,
     required this.onPickImage,
@@ -14,36 +16,18 @@ class ImageInput extends StatefulWidget {
   final void Function(File image) onPickImage;
 
   @override
-  State<ImageInput> createState() {
-    return _ImageInputState();
+  State<ImageInputView> createState() {
+    return _ImageInputViewState();
   }
 }
 
-class _ImageInputState extends State<ImageInput> {
+class _ImageInputViewState extends State<ImageInputView> {
   File? _selectedImage;
 
   @override
   void initState() {
     super.initState();
     _selectedImage = widget.initialImage;
-  }
-
-  void _chooseImage(ImageSource source) async {
-    final imagePicker = ImagePicker();
-    final pickedImage = await imagePicker.pickImage(
-      source: source,
-      maxWidth: 600,
-    );
-
-    if (pickedImage == null) {
-      return;
-    }
-
-    setState(() {
-      _selectedImage = File(pickedImage.path);
-    });
-
-    widget.onPickImage(_selectedImage!);
   }
 
   @override
@@ -71,7 +55,13 @@ class _ImageInputState extends State<ImageInput> {
                 child: TextButton.icon(
                   icon: const Icon(Icons.camera),
                   label: const Text('Take Picture'),
-                  onPressed: () => _chooseImage(ImageSource.camera),
+                  onPressed: () async {
+                    _selectedImage = await ImageInputViewModel.chooseImage(
+                      ImageSource.camera,
+                    );
+                    setState(() {});
+                    widget.onPickImage(_selectedImage!);
+                  },
                 ),
               ),
               Container(
@@ -82,7 +72,13 @@ class _ImageInputState extends State<ImageInput> {
                 child: TextButton.icon(
                   icon: const Icon(Icons.photo_library),
                   label: const Text('Choose From Gallery'),
-                  onPressed: () => _chooseImage(ImageSource.gallery),
+                  onPressed: () async {
+                    _selectedImage = await ImageInputViewModel.chooseImage(
+                      ImageSource.gallery,
+                    );
+                    setState(() {});
+                    widget.onPickImage(_selectedImage!);
+                  },
                 ),
               ),
             ],
