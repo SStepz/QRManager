@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_manager/src/data/models/member/member.dart';
 import 'package:qr_manager/src/modules/image_input/image_input_view.dart';
 import 'package:qr_manager/src/modules/qrs/modify_qr/modify_qr_view_model.dart';
+import 'package:qr_manager/src/common/components/display_dialog.dart';
 
 class ModifyQRView extends ConsumerStatefulWidget {
   const ModifyQRView({
@@ -43,6 +44,31 @@ class _ModifyQRViewState extends ConsumerState<ModifyQRView> {
     _nameController.dispose();
     _accountNameController.dispose();
     super.dispose();
+  }
+
+  void _saveQR() async {
+    final enteredName = _nameController.text;
+    final enteredAccountName = _accountNameController.text;
+
+    if (enteredName.isEmpty ||
+        enteredAccountName.isEmpty ||
+        _selectedImage == null) {
+      DisplayDialog.showDialogWithMessage(context, 'Invalid Input', 'Please make sure every field is valid.');
+      return;
+    }
+
+    await ModifyQRViewModel.saveQR(
+      ref,
+      widget.memberId,
+      enteredName,
+      enteredAccountName,
+      _selectedImage,
+      widget.qrCode,
+    );
+
+    if (mounted) {
+      Navigator.of(context).pop();
+    }
   }
 
   @override
@@ -87,22 +113,7 @@ class _ModifyQRViewState extends ConsumerState<ModifyQRView> {
             ),
             const SizedBox(height: 16),
             ElevatedButton.icon(
-              onPressed: () async {
-                await ModifyQRViewModel.saveQR(
-                  ref,
-                  context,
-                  widget.memberId,
-                  _nameController.text,
-                  _accountNameController.text,
-                  _selectedImage,
-                  widget.qrCode,
-                  () {
-                    if (mounted) {
-                      Navigator.of(context).pop();
-                    }
-                  },
-                );
-              },
+              onPressed: _saveQR,
               icon: widget.qrCode == null
                   ? const Icon(Icons.add)
                   : const Icon(Icons.save),

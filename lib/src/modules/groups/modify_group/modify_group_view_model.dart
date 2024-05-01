@@ -1,35 +1,31 @@
-import 'package:flutter/material.dart';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:collection/collection.dart';
 
 import 'package:qr_manager/src/data/models/group/group.dart';
-import 'package:qr_manager/src/common/components/display_dialog.dart';
 
 class ModifyGroupViewModel {
-  static Future<void> saveGroup(
+  static String getGroupName(WidgetRef ref, String? groupId) {
+    final groupData = ref.watch(Group.groupListProvider);
+    final group = groupData.firstWhere((group) => group.id == groupId);
+    return group.name;
+  }
+
+  static Group? getExistingGroup(
     WidgetRef ref,
-    BuildContext context,
     String groupName,
     String? groupId,
-    Function onOperationComplete,
-  ) async {
+  ) {
     final groupData = ref.watch(Group.groupListProvider);
-    final existingGroup = groupData.firstWhereOrNull(
+    final group = groupData.firstWhereOrNull(
         (group) => group.name == groupName && group.id != groupId);
+    return group;
+  }
 
-    if (groupName.isEmpty) {
-      DisplayDialog.showDialogWithMessage(context, 'Invalid Input',
-          'Please make sure a valid name was entered.');
-      return;
-    }
-
-    if (existingGroup != null) {
-      DisplayDialog.showDialogWithMessage(context, 'Invalid Input',
-          'A group with the same name already exists.');
-      return;
-    }
-
+  static Future<void> saveGroup(
+    WidgetRef ref,
+    String groupName,
+    String? groupId,
+  ) async {
     if (groupId == null) {
       await ref.read(Group.groupListProvider.notifier).addGroup(groupName);
     } else {
@@ -37,7 +33,5 @@ class ModifyGroupViewModel {
           .read(Group.groupListProvider.notifier)
           .editGroupName(groupId, groupName);
     }
-
-    onOperationComplete();
   }
 }

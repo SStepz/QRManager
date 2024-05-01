@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:qr_manager/src/data/models/member/member.dart';
 import 'package:qr_manager/src/modules/qrs/qr_detail/qr_detail_view_model.dart';
+import 'package:qr_manager/src/modules/qrs/modify_qr/modify_qr_view.dart';
 import 'package:qr_manager/src/common/components/custom_text.dart';
 
 class QRDetailView extends ConsumerStatefulWidget {
@@ -27,11 +27,8 @@ class QRDetailView extends ConsumerStatefulWidget {
 class _QRDetailViewState extends ConsumerState<QRDetailView> {
   @override
   Widget build(BuildContext context) {
-    final memberData = ref.watch(Member.memberListProvider);
-    final member =
-        memberData.firstWhere((member) => member.id == widget.memberId);
-    final qrCodes = member.qrCodes;
-    final qr = qrCodes.firstWhere((qr) => qr.id == widget.qrId);
+    final member = QRDetailViewModel.getMember(ref, widget.memberId);
+    final qr = QRDetailViewModel.getQRCode(member, widget.qrId);
 
     return Scaffold(
       appBar: AppBar(
@@ -39,11 +36,16 @@ class _QRDetailViewState extends ConsumerState<QRDetailView> {
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),
-            onPressed: () => QRDetailViewModel.navigateToModifyQR(
-              context,
-              member.id,
-              qr,
-            ),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (ctx) => ModifyQRView(
+                    memberId: member.id,
+                    qrCode: qr,
+                  ),
+                ),
+              );
+            },
           ),
         ],
       ),

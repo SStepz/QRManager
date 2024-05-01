@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:qr_manager/src/data/models/member/member.dart';
 import 'package:qr_manager/src/modules/members/modify_member/modify_member_view_model.dart';
+import 'package:qr_manager/src/common/components/display_dialog.dart';
 
 class ModifyMemberView extends ConsumerStatefulWidget {
   const ModifyMemberView({
@@ -28,10 +28,8 @@ class _ModifyMemberViewState extends ConsumerState<ModifyMemberView> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (widget.memberId != null) {
-      final memberData = ref.watch(Member.memberListProvider);
-      final member =
-          memberData.firstWhere((member) => member.id == widget.memberId);
-      _nameController.text = member.name;
+      _nameController.text =
+          ModifyMemberViewModel.getMemberName(ref, widget.memberId);
     }
   }
 
@@ -39,6 +37,35 @@ class _ModifyMemberViewState extends ConsumerState<ModifyMemberView> {
   void dispose() {
     _nameController.dispose();
     super.dispose();
+  }
+
+  void _saveMember() async {
+    final enteredName = _nameController.text;
+    final existingMember = ModifyMemberViewModel.getExistingMember(
+        ref, enteredName, widget.memberId);
+
+    if (enteredName.isEmpty) {
+      DisplayDialog.showDialogWithMessage(context, 'Invalid Input',
+          'Please make sure a valid name was entered.');
+      return;
+    }
+
+    if (existingMember != null) {
+      DisplayDialog.showDialogWithMessage(context, 'Invalid Input',
+          'A member with the same name already exists.');
+      return;
+    }
+
+    await ModifyMemberViewModel.saveMember(
+      ref,
+      widget.groupId,
+      enteredName,
+      widget.memberId,
+    );
+
+    if (mounted) {
+      Navigator.of(context).pop();
+    }
   }
 
   @override
@@ -65,20 +92,7 @@ class _ModifyMemberViewState extends ConsumerState<ModifyMemberView> {
             ),
             const SizedBox(height: 16),
             ElevatedButton.icon(
-              onPressed: () async {
-                await ModifyMemberViewModel.saveMember(
-                  ref,
-                  context,
-                  widget.groupId,
-                  _nameController.text,
-                  widget.memberId,
-                  () {
-                    if (mounted) {
-                      Navigator.of(context).pop();
-                    }
-                  },
-                );
-              },
+              onPressed: _saveMember,
               icon: widget.memberId == null
                   ? const Icon(Icons.add)
                   : const Icon(Icons.save),

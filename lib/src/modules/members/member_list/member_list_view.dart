@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:qr_manager/src/data/models/group/group.dart';
-import 'package:qr_manager/src/data/models/member/member.dart';
 import 'package:qr_manager/src/modules/members/member_list/member_list_view_model.dart';
+import 'package:qr_manager/src/modules/members/modify_member/modify_member_view.dart';
+import 'package:qr_manager/src/modules/qrs/qr_list/qr_list_view.dart';
 import 'package:qr_manager/src/common/components/custom_text.dart';
 import 'package:qr_manager/src/common/components/custom_icon.dart';
 
@@ -25,12 +25,8 @@ class MemberListView extends ConsumerStatefulWidget {
 class _MemberListViewState extends ConsumerState<MemberListView> {
   @override
   Widget build(BuildContext context) {
-    final groupData = ref.watch(Group.groupListProvider);
-    final memberData = ref.watch(Member.memberListProvider);
-    final group = groupData.firstWhere((group) => group.id == widget.groupId);
-    final members = memberData
-        .where((member) => group.memberIds.contains(member.id))
-        .toList();
+    final group = MemberListViewModel.getGroup(ref, widget.groupId);
+    final members = MemberListViewModel.getMembers(ref, group);
 
     Widget content = Center(
       child: CustomText.bodyLarge(
@@ -73,12 +69,16 @@ class _MemberListViewState extends ConsumerState<MemberListView> {
                 child: Row(
                   children: [
                     IconButton(
-                      onPressed: () =>
-                          MemberListViewModel.navigateToModifyMember(
-                        context: context,
-                        groupId: group.id,
-                        memberId: member.id,
-                      ),
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (ctx) => ModifyMemberView(
+                              groupId: group.id,
+                              memberId: member.id,
+                            ),
+                          ),
+                        );
+                      },
                       icon: const Icon(Icons.edit),
                     ),
                     const SizedBox(width: 4),
@@ -132,11 +132,16 @@ class _MemberListViewState extends ConsumerState<MemberListView> {
                   ],
                 ),
               ),
-              onTap: () => MemberListViewModel.navigateToQRList(
-                context,
-                group.id,
-                member.id,
-              ),
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (ctx) => QRListView(
+                      groupId: group.id,
+                      memberId: member.id,
+                    ),
+                  ),
+                );
+              },
             ),
           );
         },
@@ -149,10 +154,13 @@ class _MemberListViewState extends ConsumerState<MemberListView> {
         actions: [
           IconButton(
             icon: const Icon(Icons.person_add),
-            onPressed: () => MemberListViewModel.navigateToModifyMember(
-              context: context,
-              groupId: group.id,
-            ),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (ctx) => ModifyMemberView(groupId: group.id),
+                ),
+              );
+            },
           ),
         ],
       ),

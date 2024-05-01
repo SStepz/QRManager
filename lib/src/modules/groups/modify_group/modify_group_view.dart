@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:qr_manager/src/data/models/group/group.dart';
 import 'package:qr_manager/src/modules/groups/modify_group/modify_group_view_model.dart';
+import 'package:qr_manager/src/common/components/display_dialog.dart';
 
 class ModifyGroupView extends ConsumerStatefulWidget {
   const ModifyGroupView({
@@ -26,9 +26,8 @@ class _ModifyGroupViewState extends ConsumerState<ModifyGroupView> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (widget.groupId != null) {
-      final groupData = ref.watch(Group.groupListProvider);
-      final group = groupData.firstWhere((group) => group.id == widget.groupId);
-      _nameController.text = group.name;
+      _nameController.text =
+          ModifyGroupViewModel.getGroupName(ref, widget.groupId);
     }
   }
 
@@ -36,6 +35,30 @@ class _ModifyGroupViewState extends ConsumerState<ModifyGroupView> {
   void dispose() {
     _nameController.dispose();
     super.dispose();
+  }
+
+  void _saveGroup() async {
+    final enteredName = _nameController.text;
+    final existingGroup =
+        ModifyGroupViewModel.getExistingGroup(ref, enteredName, widget.groupId);
+
+    if (enteredName.isEmpty) {
+      DisplayDialog.showDialogWithMessage(context, 'Invalid Input',
+          'Please make sure a valid name was entered.');
+      return;
+    }
+
+    if (existingGroup != null) {
+      DisplayDialog.showDialogWithMessage(context, 'Invalid Input',
+          'A group with the same name already exists.');
+      return;
+    }
+
+    await ModifyGroupViewModel.saveGroup(ref, enteredName, widget.groupId);
+
+    if (mounted) {
+      Navigator.of(context).pop();
+    }
   }
 
   @override
@@ -62,19 +85,7 @@ class _ModifyGroupViewState extends ConsumerState<ModifyGroupView> {
             ),
             const SizedBox(height: 16),
             ElevatedButton.icon(
-              onPressed: () async {
-                await ModifyGroupViewModel.saveGroup(
-                  ref,
-                  context,
-                  _nameController.text,
-                  widget.groupId,
-                  () {
-                    if (mounted) {
-                      Navigator.of(context).pop();
-                    }
-                  },
-                );
-              },
+              onPressed: _saveGroup,
               icon: widget.groupId == null
                   ? const Icon(Icons.add)
                   : const Icon(Icons.save),

@@ -1,50 +1,19 @@
-import 'package:flutter/material.dart';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:qr_manager/src/data/models/group/group.dart';
 import 'package:qr_manager/src/data/models/member/member.dart';
-import 'package:qr_manager/src/modules/qrs/modify_qr/modify_qr_view.dart';
-import 'package:qr_manager/src/modules/qrs/qr_detail/qr_detail_view.dart';
 
 class QRListViewModel {
-  static void navigateToModifyQR({
-    required BuildContext context,
-    required String memberId,
-    QRCode? qrCode,
-  }) {
-    if (qrCode == null) {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (ctx) => ModifyQRView(memberId: memberId),
-        ),
-      );
-    } else {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (ctx) => ModifyQRView(
-            memberId: memberId,
-            qrCode: qrCode,
-          ),
-        ),
-      );
-    }
+  static Group getGroup(WidgetRef ref, String groupId) {
+    final groupData = ref.watch(Group.groupListProvider);
+    final group = groupData.firstWhere((group) => group.id == groupId);
+    return group;
   }
 
-  static void navigateToQRDetail(
-    BuildContext context,
-    String groupId,
-    String memberId,
-    String qrId,
-  ) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (ctx) => QRDetailView(
-          groupId: groupId,
-          memberId: memberId,
-          qrId: qrId,
-        ),
-      ),
-    );
+  static Member getMember(WidgetRef ref, String memberId) {
+    final memberData = ref.watch(Member.memberListProvider);
+    final member = memberData.firstWhere((member) => member.id == memberId);
+    return member;
   }
 
   static Future<void> removeQR(

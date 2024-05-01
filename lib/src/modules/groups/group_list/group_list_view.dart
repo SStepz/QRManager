@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:qr_manager/src/data/models/group/group.dart';
 import 'package:qr_manager/src/modules/groups/group_list/group_list_view_model.dart';
+import 'package:qr_manager/src/modules/groups/modify_group/modify_group_view.dart';
+import 'package:qr_manager/src/modules/members/member_list/member_list_view.dart';
 import 'package:qr_manager/src/common/components/custom_text.dart';
 import 'package:qr_manager/src/common/components/custom_icon.dart';
 
@@ -62,10 +64,14 @@ class _GroupListViewState extends ConsumerState<GroupListView> {
                 child: Row(
                   children: [
                     IconButton(
-                      onPressed: () => GroupListViewModel.navigateToModifyGroup(
-                        context: context,
-                        groupId: group.id,
-                      ),
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (ctx) =>
+                                ModifyGroupView(groupId: group.id),
+                          ),
+                        );
+                      },
                       icon: const Icon(Icons.edit),
                     ),
                     const SizedBox(width: 4),
@@ -115,8 +121,13 @@ class _GroupListViewState extends ConsumerState<GroupListView> {
                   ],
                 ),
               ),
-              onTap: () =>
-                  GroupListViewModel.navigateToMemberList(context, group.id),
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (ctx) => MemberListView(groupId: group.id),
+                  ),
+                );
+              },
             ),
           );
         },
@@ -129,8 +140,13 @@ class _GroupListViewState extends ConsumerState<GroupListView> {
         actions: [
           IconButton(
             icon: const Icon(Icons.group_add),
-            onPressed: () =>
-                GroupListViewModel.navigateToModifyGroup(context: context),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (ctx) => const ModifyGroupView(),
+                ),
+              );
+            },
           ),
         ],
       ),
