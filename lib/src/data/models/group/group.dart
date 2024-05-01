@@ -35,11 +35,13 @@ class Group {
 }
 
 class GroupListNotifier extends StateNotifier<List<Group>> {
-  GroupListNotifier() : super(const []) {
+  GroupListNotifier({GroupServicesInterface? groupServices})
+      : _groupServices = groupServices ?? GroupServices(),
+        super(const []) {
     _loadGroups();
   }
 
-  final GroupServicesInterface _groupServices = GroupServices();
+  final GroupServicesInterface _groupServices;
 
   Future<void> _loadGroups() async {
     state = await _groupServices.loadGroups();

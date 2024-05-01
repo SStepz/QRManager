@@ -61,11 +61,13 @@ class QRCode {
 }
 
 class MemberListNotifier extends StateNotifier<List<Member>> {
-  MemberListNotifier() : super(const []) {
+  MemberListNotifier({MemberServicesInterface? memberServices})
+      : _memberServices = memberServices ?? MemberServices(),
+        super(const []) {
     _loadMembers();
   }
 
-  final MemberServicesInterface _memberServices = MemberServices();
+  final MemberServicesInterface _memberServices;
 
   Future<void> _loadMembers() async {
     state = await _memberServices.loadMembers();
