@@ -13,13 +13,14 @@ class ModifyQRViewModel {
     File? image,
     QRCode? qrCode,
   ) async {
+    image ??= File('');
     if (qrCode == null) {
       await ref.read(Member.memberListProvider.notifier).addQR(
           memberId,
           QRCode(
             name: qrName,
             accountName: qrAccountName,
-            imagePath: image!.path,
+            imagePath: image.path,
           ));
     } else {
       await ref.read(Member.memberListProvider.notifier).editQR(
@@ -29,7 +30,7 @@ class ModifyQRViewModel {
               id: qrCode.id,
               name: qrName,
               accountName: qrAccountName,
-              imagePath: image!.path));
+              imagePath: image.path));
     }
   }
 }
